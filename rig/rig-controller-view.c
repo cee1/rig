@@ -1366,8 +1366,7 @@ draw_timeline_background (RigPathView *path_view,
       rowstride = cogl_bitmap_get_rowstride (bitmap);
       tex_data = cogl_buffer_map (buffer,
                                   COGL_BUFFER_ACCESS_WRITE,
-                                  COGL_BUFFER_MAP_HINT_DISCARD,
-                                  NULL);
+                                  COGL_BUFFER_MAP_HINT_DISCARD);
 
       memset (tex_data, 0xff, rowstride * tex_height);
       for (y = 0; y < tex_height; y++)

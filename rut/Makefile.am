@@ -199,6 +199,15 @@ librut_la_CPPFLAGS = \
     -I$(top_srcdir) \
     -I$(top_srcdir)/rut
 
+if HAVE_OSX
+librut_la_SOURCES += \
+    util-fmemopen.c \
+    util-fmemopen.h
+
+librut_la_CPPFLAGS += \
+    -DUSE_FMEM_WRAPPER
+endif
+
 # rut_headersdir =  $(includedir)/rut
 # rut_headers_DATA = $(source_h)
 

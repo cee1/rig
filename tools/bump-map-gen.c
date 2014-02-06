@@ -93,7 +93,7 @@ generate_bump_map (CoglContext *ctx,
                    const char *path,
                    const char *output)
 {
-  CoglBitmap *bitmap = cogl_bitmap_new_from_file (ctx, path, NULL);
+  CoglBitmap *bitmap = cogl_bitmap_new_from_file (path, NULL);
   CoglTexture *src = cogl_texture_2d_new_from_bitmap (bitmap);
 
   int tex_width = cogl_texture_get_width (src);
@@ -154,7 +154,7 @@ generate_normal_map (CoglContext *ctx,
                      const char *path,
                      const char *output)
 {
-  CoglBitmap *bitmap = cogl_bitmap_new_from_file (ctx, path, NULL);
+  CoglBitmap *bitmap = cogl_bitmap_new_from_file (path, NULL);
   CoglTexture *src =
     cogl_texture_2d_new_from_bitmap (bitmap);
 

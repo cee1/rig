@@ -384,9 +384,7 @@ rut_drop_down_paint_selector (RutDropDown *drop,
                                                rectangle */
                                             0.5f, 0.5f, 0.5f, 0.5f);
 
-  cogl_path_stroke (drop->selector_outline_path,
-                    fb,
-                    drop->selector_outline_pipeline);
+  cogl_path_stroke (drop->selector_outline_path);
 
   rut_drop_down_ensure_layouts (drop);
 
@@ -687,7 +685,7 @@ rut_drop_down_handle_click (RutDropDown *drop,
                                   0, 0, 0, 255);
     }
 
-  drop->selector_outline_path = cogl_path_new (drop->context->cogl_context);
+  drop->selector_outline_path = cogl_path_new ();
   cogl_path_rectangle (drop->selector_outline_path,
                        drop->selector_x,
                        drop->selector_y,

@@ -59,10 +59,10 @@ get_color_array (CoglColor *color)
 {
   static float array[4];
 
-  array[0] = color->red;
-  array[1] = color->green;
-  array[2] = color->blue;
-  array[3] = color->alpha;
+  array[0] = cogl_color_get_red (color);
+  array[1] = cogl_color_get_green (color);
+  array[2] = cogl_color_get_blue (color);
+  array[3] = cogl_color_get_alpha (color);
 
   return array;
 }

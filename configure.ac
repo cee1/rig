@@ -279,7 +279,7 @@ AM_PATH_GLIB_2_0([glib_req_version],
                  [gobject gthread gmodule-no-export])
 AS_IF([test "x$have_glib" = "xno"], AC_MSG_ERROR([glib-2.0 is required]))
 
-RIG_PKG_REQUIRES="$RIG_PKG_REQUIRES glib-2.0 gio-2.0 cogl2 cogl-pango2 cogl-path avahi-glib avahi-client avahi-core libprotobuf-c cogl-gst gdk-pixbuf-2.0"
+RIG_PKG_REQUIRES="$RIG_PKG_REQUIRES glib-2.0 gio-2.0 cogl-2.0-experimental cogl-pango-2.0-experimental cogl-path-2.0-experimental libprotobuf-c cogl-gst-2.0-experimental gdk-pixbuf-2.0 avahi-glib avahi-client avahi-core"
 
 dnl Check whether we are building for Android
 AC_CHECK_DECL([__ANDROID__],

@@ -365,10 +365,10 @@ _rut_camera_view_paint (RutObject *object,
       rut_camera_flush (camera_component);
       cogl_framebuffer_clear4f (pass_fb,
                                 COGL_BUFFER_BIT_COLOR|COGL_BUFFER_BIT_DEPTH,
-                                camera_component->bg_color.red,
-                                camera_component->bg_color.green,
-                                camera_component->bg_color.blue,
-                                camera_component->bg_color.alpha);
+                                cogl_color_get_red (&camera_component->bg_color),
+                                cogl_color_get_green (&camera_component->bg_color),
+                                cogl_color_get_blue (&camera_component->bg_color),
+                                cogl_color_get_alpha (&camera_component->bg_color));
       rut_camera_end_frame (camera_component);
 
       rig_paint_ctx->pass = RIG_PASS_COLOR_UNBLENDED;

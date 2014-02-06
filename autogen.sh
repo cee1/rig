@@ -11,11 +11,6 @@ PROJECT=Rig
 TEST_TYPE=-f
 FILE=rig/jni/rig-engine.c
 
-test $TEST_TYPE $FILE || {
-	echo "You must run this script in the top-level $PROJECT directory"
-	exit 1
-}
-
 # GNU gettext automake support doesn't get along with git.
 # https://bugzilla.gnome.org/show_bug.cgi?id=661128
 #touch -t 200001010000 po/rig.pot

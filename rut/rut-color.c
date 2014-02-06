@@ -27,10 +27,10 @@
 
 #include <glib.h>
 
-#include <cogl/cogl.h>
+#define COGL_COMPILATION
+#include <cogl/cogl-color.h>
 
 #include "color-table.h"
-#include "rut-context.h"
 #include "rut-color.h"
 
 static inline void
@@ -267,162 +267,6 @@ parse_hsla (CoglColor *color,
   return TRUE;
 }
 
-gboolean
-rut_color_init_from_string (RutContext *ctx,
-                            CoglColor *color,
-                            const char *str)
-{
-  void *color_index_ptr;
-
-  g_return_val_if_fail (color != NULL, FALSE);
-  g_return_val_if_fail (str != NULL, FALSE);
-
-  if (strncmp (str, "rgb", 3) == 0)
-    {
-      char *s = (char *)str;
-      gboolean res;
-
-      if (strncmp (str, "rgba", 4) == 0)
-        res = parse_rgba (color, s + 4, TRUE);
-      else
-        res = parse_rgba (color, s + 3, FALSE);
-
-      return res;
-    }
-
-  if (strncmp (str, "hsl", 3) == 0)
-    {
-      char *s = (char *)str;
-      gboolean res;
-
-      if (strncmp (str, "hsla", 4) == 0)
-        res = parse_hsla (color, s + 4, TRUE);
-      else
-        res = parse_hsla (color, s + 3, FALSE);
-
-      return res;
-    }
-
-  /* if the string contains a color encoded using the hexadecimal
-   * notations (#rrggbbaa or #rgba) we attempt a rough pass at
-   * parsing the color ourselves, as we need the alpha channel that
-   * Pango can't retrieve.
-   */
-  if (str[0] == '#' && str[1] != '\0')
-    {
-      guint8 red, green, blue, alpha;
-      size_t length = strlen (str + 1);
-      unsigned int result;
-
-      if (sscanf (str + 1, "%x", &result) == 1)
-        {
-          switch (length)
-            {
-            case 8: /* rrggbbaa */
-              red   = (result >> 24) & 0xff;
-              green = (result >> 16) & 0xff;
-              blue  = (result >>  8) & 0xff;
-
-              alpha = result & 0xff;
-
-              cogl_color_init_from_4ub (color, red, green, blue, alpha);
-
-              return TRUE;
-
-            case 6: /* #rrggbb */
-              red   = (result >> 16) & 0xff;
-              green = (result >>  8) & 0xff;
-              blue  = result & 0xff;
-
-              alpha = 0xff;
-
-              cogl_color_init_from_4ub (color, red, green, blue, alpha);
-
-              return TRUE;
-
-            case 4: /* #rgba */
-              red   = ((result >> 12) & 0xf);
-              green = ((result >>  8) & 0xf);
-              blue  = ((result >>  4) & 0xf);
-              alpha = result & 0xf;
-
-              red   = (red   << 4) | red;
-              green = (green << 4) | green;
-              blue  = (blue  << 4) | blue;
-              alpha = (alpha << 4) | alpha;
-
-              cogl_color_init_from_4ub (color, red, green, blue, alpha);
-
-              return TRUE;
-
-            case 3: /* #rgb */
-              red   = ((result >>  8) & 0xf);
-              green = ((result >>  4) & 0xf);
-              blue  = result & 0xf;
-
-              red   = (red   << 4) | red;
-              green = (green << 4) | green;
-              blue  = (blue  << 4) | blue;
-
-              alpha = 0xff;
-
-              cogl_color_init_from_4ub (color, red, green, blue, alpha);
-
-              return TRUE;
-
-            default:
-              return FALSE;
-            }
-        }
-    }
-
-  /* fall back to X11-style named colors; see:
-   *
-   *   http://en.wikipedia.org/wiki/X11_color_names
-   */
-
-  if (!ctx->colors_hash)
-    {
-      int i, n_colors;
-
-      ctx->colors_hash = g_hash_table_new (g_direct_hash, g_int_equal);
-
-      n_colors = G_N_ELEMENTS (color_names);
-      for (i = 0; i < n_colors; i++)
-        {
-          const char *interned = g_intern_string (color_names[i]);
-          g_hash_table_insert (ctx->colors_hash, (gpointer)interned, GINT_TO_POINTER (i + 1));
-        }
-    }
-
-  color_index_ptr = g_hash_table_lookup (ctx->colors_hash,
-                                         g_intern_string (str));
-  if (color_index_ptr)
-    {
-      /* Since we can't store 0 in the hash table without creating an ambiguity
-       * when retrieving the value back the indices stored are all offset by
-       * one. */
-      int color_index = GPOINTER_TO_INT (color_index_ptr) - 1;
-      cogl_color_init_from_4ub (color,
-                               color_entries[color_index].red,
-                               color_entries[color_index].green,
-                               color_entries[color_index].blue,
-                               255);
-      return TRUE;
-    }
-
-  return FALSE;
-}
-
-void
-rut_color_init_from_uint32 (CoglColor *color, uint32_t value)
-{
-  color->red = RUT_UINT32_RED_AS_FLOAT (value);
-  color->green = RUT_UINT32_GREEN_AS_FLOAT (value);
-  color->blue = RUT_UINT32_BLUE_AS_FLOAT (value);
-  color->alpha = RUT_UINT32_ALPHA_AS_FLOAT (value);
-}
-
 void
 rut_color_add (const CoglColor *a,
                const CoglColor *b,
@@ -614,3 +458,163 @@ rut_color_interpolate (const CoglColor *initial,
   result->blue  = initial->blue  + (final->blue  - initial->blue)  * progress;
   result->alpha = initial->alpha + (final->alpha - initial->alpha) * progress;
 }
+
+#undef COGL_COMPILATION
+#include "rut-context.h"
+
+CoglBool
+rut_color_init_from_string (RutContext *ctx,
+                            CoglColor *color,
+                            const char *str)
+{
+  void *color_index_ptr;
+
+  g_return_val_if_fail (color != NULL, FALSE);
+  g_return_val_if_fail (str != NULL, FALSE);
+
+  if (strncmp (str, "rgb", 3) == 0)
+    {
+      char *s = (char *)str;
+      gboolean res;
+
+      if (strncmp (str, "rgba", 4) == 0)
+        res = parse_rgba (color, s + 4, TRUE);
+      else
+        res = parse_rgba (color, s + 3, FALSE);
+
+      return res;
+    }
+
+  if (strncmp (str, "hsl", 3) == 0)
+    {
+      char *s = (char *)str;
+      gboolean res;
+
+      if (strncmp (str, "hsla", 4) == 0)
+        res = parse_hsla (color, s + 4, TRUE);
+      else
+        res = parse_hsla (color, s + 3, FALSE);
+
+      return res;
+    }
+
+  /* if the string contains a color encoded using the hexadecimal
+   * notations (#rrggbbaa or #rgba) we attempt a rough pass at
+   * parsing the color ourselves, as we need the alpha channel that
+   * Pango can't retrieve.
+   */
+  if (str[0] == '#' && str[1] != '\0')
+    {
+      guint8 red, green, blue, alpha;
+      size_t length = strlen (str + 1);
+      unsigned int result;
+
+      if (sscanf (str + 1, "%x", &result) == 1)
+        {
+          switch (length)
+            {
+            case 8: /* rrggbbaa */
+              red   = (result >> 24) & 0xff;
+              green = (result >> 16) & 0xff;
+              blue  = (result >>  8) & 0xff;
+
+              alpha = result & 0xff;
+
+              cogl_color_init_from_4ub (color, red, green, blue, alpha);
+
+              return TRUE;
+
+            case 6: /* #rrggbb */
+              red   = (result >> 16) & 0xff;
+              green = (result >>  8) & 0xff;
+              blue  = result & 0xff;
+
+              alpha = 0xff;
+
+              cogl_color_init_from_4ub (color, red, green, blue, alpha);
+
+              return TRUE;
+
+            case 4: /* #rgba */
+              red   = ((result >> 12) & 0xf);
+              green = ((result >>  8) & 0xf);
+              blue  = ((result >>  4) & 0xf);
+              alpha = result & 0xf;
+
+              red   = (red   << 4) | red;
+              green = (green << 4) | green;
+              blue  = (blue  << 4) | blue;
+              alpha = (alpha << 4) | alpha;
+
+              cogl_color_init_from_4ub (color, red, green, blue, alpha);
+
+              return TRUE;
+
+            case 3: /* #rgb */
+              red   = ((result >>  8) & 0xf);
+              green = ((result >>  4) & 0xf);
+              blue  = result & 0xf;
+
+              red   = (red   << 4) | red;
+              green = (green << 4) | green;
+              blue  = (blue  << 4) | blue;
+
+              alpha = 0xff;
+
+              cogl_color_init_from_4ub (color, red, green, blue, alpha);
+
+              return TRUE;
+
+            default:
+              return FALSE;
+            }
+        }
+    }
+
+  /* fall back to X11-style named colors; see:
+   *
+   *   http://en.wikipedia.org/wiki/X11_color_names
+   */
+
+  if (!ctx->colors_hash)
+    {
+      int i, n_colors;
+
+      ctx->colors_hash = g_hash_table_new (g_direct_hash, g_int_equal);
+
+      n_colors = G_N_ELEMENTS (color_names);
+      for (i = 0; i < n_colors; i++)
+        {
+          const char *interned = g_intern_string (color_names[i]);
+          g_hash_table_insert (ctx->colors_hash, (gpointer)interned, GINT_TO_POINTER (i + 1));
+        }
+    }
+
+  color_index_ptr = g_hash_table_lookup (ctx->colors_hash,
+                                         g_intern_string (str));
+  if (color_index_ptr)
+    {
+      /* Since we can't store 0 in the hash table without creating an ambiguity
+       * when retrieving the value back the indices stored are all offset by
+       * one. */
+      int color_index = GPOINTER_TO_INT (color_index_ptr) - 1;
+      cogl_color_init_from_4ub (color,
+                               color_entries[color_index].red,
+                               color_entries[color_index].green,
+                               color_entries[color_index].blue,
+                               255);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+void
+rut_color_init_from_uint32 (CoglColor *color, uint32_t value)
+{
+  color->red = RUT_UINT32_RED_AS_FLOAT (value);
+  color->green = RUT_UINT32_GREEN_AS_FLOAT (value);
+  color->blue = RUT_UINT32_BLUE_AS_FLOAT (value);
+  color->alpha = RUT_UINT32_ALPHA_AS_FLOAT (value);
+}
+

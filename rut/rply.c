@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#ifdef USE_FMEM_WRAPPER
+#include "util-fmemopen.h"
+#endif
+
 #include "rply.h"
 
 /* ----------------------------------------------------------------------

@@ -445,7 +445,7 @@ register_serializer_object (RigPBSerializer *serializer,
     }
 
   id = serializer->next_id++;
-  g_return_if_fail (id != 0);
+  g_return_val_if_fail (id != 0, 0);
 
   id_value = g_slice_new (uint64_t);
 

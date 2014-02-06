@@ -163,15 +163,23 @@ rig_node_color_lerp (RigNode *a,
     {
       float offset = t - a->t;
       float factor = offset / range;
+      float reda, greena, bluea, alphaa;
+      float redb, greenb, blueb, alphab;
 
-      value->red = a->boxed.d.color_val.red +
-        (b->boxed.d.color_val.red - a->boxed.d.color_val.red) * factor;
-      value->green = a->boxed.d.color_val.green +
-        (b->boxed.d.color_val.green - a->boxed.d.color_val.green) * factor;
-      value->blue = a->boxed.d.color_val.blue +
-        (b->boxed.d.color_val.blue - a->boxed.d.color_val.blue) * factor;
-      value->alpha = a->boxed.d.color_val.alpha +
-        (b->boxed.d.color_val.alpha - a->boxed.d.color_val.alpha) * factor;
+      reda = cogl_color_get_red (&a->boxed.d.color_val);
+      greena = cogl_color_get_green (&a->boxed.d.color_val);
+      bluea = cogl_color_get_blue (&a->boxed.d.color_val);
+      alphaa = cogl_color_get_alpha (&a->boxed.d.color_val);
+
+      redb = cogl_color_get_red (&b->boxed.d.color_val);
+      greenb = cogl_color_get_green (&b->boxed.d.color_val);
+      blueb = cogl_color_get_blue (&b->boxed.d.color_val);
+      alphab = cogl_color_get_alpha (&b->boxed.d.color_val);
+
+      cogl_color_set_red (value, reda + (redb - reda) * factor);
+      cogl_color_set_green (value, greena + (greenb - greena) * factor);
+      cogl_color_set_blue (value, bluea + (blueb - bluea) * factor);
+      cogl_color_set_alpha (value, alphaa + (alphab - alphaa) * factor);
     }
   else
     memcpy (value, &a->boxed.d.color_val, sizeof (CoglColor));

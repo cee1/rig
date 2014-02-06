@@ -31,19 +31,19 @@
 #include <glib.h>
 
 #include "rig-osx.h"
-#include "rig-data.h"
+//#include "rig-data.h"
 #include "rig-load-save.h"
 
 @interface Controller : NSObject
 {
-  RigData *data;
+  RigEngine *data;
 }
 
 @end
 
 @implementation Controller
 
-- (id) init:(RigData *) data_in
+- (id) init:(RigEngine *) data_in
 {
   self = [super init];
 
@@ -213,7 +213,7 @@ check_update_messages (void)
 }
 
 void
-rig_osx_init (RigData *data)
+rig_osx_init (RigEngine *data)
 {
   RigOSXData *osx_data;
   CoglOnscreen *onscreen = data->onscreen;
@@ -267,7 +267,7 @@ rig_osx_init (RigData *data)
 }
 
 void
-rig_osx_deinit (RigData *data)
+rig_osx_deinit (RigEngine *data)
 {
   RigOSXData *osx_data = data->osx_data;
 

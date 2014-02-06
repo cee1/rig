@@ -299,8 +299,7 @@ ensure_hs_pipeline (RutColorPicker *picker)
 
   data = cogl_buffer_map (buffer,
                           COGL_BUFFER_ACCESS_WRITE,
-                          COGL_BUFFER_MAP_HINT_DISCARD,
-                          NULL);
+                          COGL_BUFFER_MAP_HINT_DISCARD);
 
   p = data;
 
@@ -396,8 +395,7 @@ ensure_v_pipeline (RutColorPicker *picker)
 
   data = cogl_buffer_map (buffer,
                           COGL_BUFFER_ACCESS_WRITE,
-                          COGL_BUFFER_MAP_HINT_DISCARD,
-                          NULL);
+                          COGL_BUFFER_MAP_HINT_DISCARD);
 
   p = data;
 
@@ -690,7 +688,12 @@ static void
 set_color_hsv (RutColorPicker *picker,
                const float hsv[3])
 {
-  hsv_to_rgb (hsv, &picker->color.red);
+  float rgb[3];
+
+  hsv_to_rgb (hsv, rgb);
+  cogl_color_set_red (&picker->color, rgb[0]);
+  cogl_color_set_green (&picker->color, rgb[1]);
+  cogl_color_set_blue (&picker->color, rgb[2]);
 
   rut_property_dirty (&picker->context->property_ctx,
                       &picker->properties[RUT_COLOR_PICKER_PROP_COLOR]);
@@ -915,10 +918,14 @@ rut_color_picker_set_color (RutObject *obj,
   if (memcmp (&picker->color, color, sizeof (CoglColor)))
     {
       float hsv[3];
+      float rgb[3];
 
       picker->color = *color;
+      rgb[0] = cogl_color_get_red (color);
+      rgb[1] = cogl_color_get_green (color);
+      rgb[2] = cogl_color_get_blue (color);
 
-      rgb_to_hsv (&color->red, hsv);
+      rgb_to_hsv (rgb, hsv);
 
       set_hue_saturation (picker, hsv[0], hsv[1]);
       set_value (picker, hsv[2]);

@@ -1648,10 +1648,10 @@ selection_paint (RutText *text,
             color = &text->text_color;
 
           cogl_pipeline_set_color4f (pipeline,
-                                     color->red,
-                                     color->green,
-                                     color->blue,
-                                     paint_opacity * color->alpha);
+                                     cogl_color_get_red (color),
+                                     cogl_color_get_green (color),
+                                     cogl_color_get_blue (color),
+                                     paint_opacity * cogl_color_get_alpha (color));
 
           cogl_framebuffer_draw_rectangle (fb,
                                            pipeline,
@@ -1664,7 +1664,7 @@ selection_paint (RutText *text,
         {
           /* Paint selection background first */
           PangoLayout *layout = rut_text_get_layout (text);
-          CoglPath *selection_path = cogl_path_new (text->ctx->cogl_context);
+          CoglPath *selection_path = cogl_path_new ();
           CoglColor cogl_color = { 0, };
           CoglPipeline *pipeline = cogl_pipeline_new (text->ctx->cogl_context);
 
@@ -1677,16 +1677,16 @@ selection_paint (RutText *text,
             color = &text->text_color;
 
           cogl_pipeline_set_color4f (pipeline,
-                                     color->red,
-                                     color->green,
-                                     color->blue,
-                                     paint_opacity * color->alpha);
+                                     cogl_color_get_red (color),
+                                     cogl_color_get_green (color),
+                                     cogl_color_get_blue (color),
+                                     paint_opacity * cogl_color_get_alpha (color));
 
           rut_text_foreach_selection_rectangle (text,
                                                 add_selection_rectangle_to_path,
                                                 selection_path);
 
-          cogl_path_fill (selection_path, fb, pipeline);
+          cogl_path_fill (selection_path);
 
           /* Paint selected text */
           cogl_framebuffer_push_path_clip (fb,
@@ -1700,10 +1700,10 @@ selection_paint (RutText *text,
             color = &text->text_color;
 
           cogl_color_init_from_4f (&cogl_color,
-                                   color->red,
-                                   color->green,
-                                   color->blue,
-                                   paint_opacity * color->alpha);
+                                   cogl_color_get_red (color),
+                                   cogl_color_get_green (color),
+                                   cogl_color_get_blue (color),
+                                   paint_opacity * cogl_color_get_alpha (color));
 
           cogl_pango_show_layout (fb, layout, text->text_x, 0, &cogl_color);
 
@@ -2816,12 +2816,12 @@ rut_text_paint (RutObject *object,
     }
 
   real_opacity = rut_text_get_paint_opacity (text)
-               * text->text_color.alpha;
+               * cogl_color_get_alpha (&text->text_color);
 
   cogl_color_init_from_4f (&color,
-                           text->text_color.red,
-                           text->text_color.green,
-                           text->text_color.blue,
+                           cogl_color_get_red (&text->text_color),
+                           cogl_color_get_green (&text->text_color),
+                           cogl_color_get_blue (&text->text_color),
                            real_opacity);
   cogl_pango_show_layout (fb, layout, text_x, text->text_y, &color);
 

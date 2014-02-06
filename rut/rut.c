@@ -377,7 +377,7 @@ rut_context_new (RutShell *shell)
       cogl_matrix_init_identity (&context->identity_matrix);
 
       context->pango_font_map =
-        COGL_PANGO_FONT_MAP (cogl_pango_font_map_new (context->cogl_context));
+        COGL_PANGO_FONT_MAP (cogl_pango_font_map_new ());
 
       cogl_pango_font_map_set_use_mipmapping (context->pango_font_map, TRUE);
 

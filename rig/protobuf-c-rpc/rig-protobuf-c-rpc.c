@@ -733,9 +733,11 @@ enqueue_request (PB_RPC_Client *client,
 
   /* Pack message */
   packed_size = protobuf_c_message_get_packed_size (input);
+#if 0
   if (packed_size < client->allocator->max_alloca)
     packed_data = alloca (packed_size);
   else
+#endif
     packed_data = client->allocator->alloc (client->allocator, packed_size);
   protobuf_c_message_pack (input, packed_data);
 
@@ -748,8 +750,10 @@ enqueue_request (PB_RPC_Client *client,
   rig_protobuf_c_data_buffer_append (&client->stream->outgoing,
                                      packed_data, packed_size);
 
+#if 0
   /* Clean up if not using alloca() */
   if (packed_size >= client->allocator->max_alloca)
+#endif
     client->allocator->free (client->allocator, packed_data);
 
   /* Add closure to request-tree */

@@ -23,8 +23,8 @@
 
 #include <glib.h>
 
+#ifndef COGL_COMPILATION
 #include <cogl/cogl.h>
-
 #include "rut-context.h"
 
 CoglBool
@@ -34,6 +34,7 @@ rut_color_init_from_string (RutContext *ctx,
 
 void
 rut_color_init_from_uint32 (CoglColor *color, uint32_t value);
+#endif
 
 /**
  * rut_color_add:

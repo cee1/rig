@@ -1464,7 +1464,7 @@ get_entity_pipeline (RigEngine *engine,
   GetPipelineFlags flags = 0;
   RutAsset *asset;
 
-  g_return_if_fail (material != NULL);
+  g_return_val_if_fail (material != NULL, NULL);
 
   /* FIXME: Instead of having rut_entity apis for caching image
    * sources, we should allow the renderer to track arbitrary
@@ -2054,10 +2054,10 @@ rig_paint_camera_entity (RutEntity *view_camera,
     {
       CoglPipeline *pipeline = cogl_pipeline_new (ctx);
       cogl_pipeline_set_color4f (pipeline,
-                                 play_camera->bg_color.red,
-                                 play_camera->bg_color.green,
-                                 play_camera->bg_color.blue,
-                                 play_camera->bg_color.alpha);
+                                 cogl_color_get_red (&play_camera->bg_color),
+                                 cogl_color_get_green (&play_camera->bg_color),
+                                 cogl_color_get_blue (&play_camera->bg_color),
+                                 cogl_color_get_alpha (&play_camera->bg_color));
       cogl_framebuffer_draw_rectangle (fb,
                                        pipeline,
                                        0, 0,
